@@ -1,0 +1,85 @@
+
+function diffusionXiaodong
+
+  path(path,'./UniformSampling');
+%parameters
+
+n_parts = 1000;     part_size = .1;     n_exits = 50;       exit_size = .2;         cell_size = 10;
+
+nuc_size = 0;       high_viscosity = 1; low_viscosity = .5; viscosity_border = 8;
+
+init_speed = .01;   time_limit = 10000; time_unit = 1;
+
+%init positins
+partsAll = rand_pick_sphere(n_parts,nuc_size,cell_size);
+%init velocity
+vAll = rand_pick_sphere(n_parts,1,1).*init_speed;
+%generate exit centers
+exitCenters =  ParticleSampleSphere('N',n_exits);
+
+theTime = 0;
+partsExited = [];
+
+while theTime<time_limit
+
+partsTmp = partsAll;
+vTmp = vAll;
+
+%get sph coords
+[ths,phs,rs] = cart2sph(partsAll(:,1),partsAll(:,2),partsAll(:,3));
+projections = sumpartsAll/repmat(sum(sumpartsAll.^2,2),size(sumpartsAll));
+%remove exiting particles and vs
+exitBool = zeros(n_parts,1);
+
+for ectr = 1:n_exits
+    c = exitCenters(:,ectr);
+    cdists = ((projections(:,1)-c(1)).^2+(projections(:,2)-c(2)).^2+(projections(:,3)-c(3)).^2).^.5;
+     Condition1 = ((cdists<.1));
+     Condition2 = rs>viscosity_border;
+     exitBool = exitBool || (Condition1&&Condition2);
+end
+
+partsExited = [partsExited;partsTmp(exitBool,:)];
+
+partsTmp(exitBool,:)=[];
+vTmp(exitBool,:)=[];
+
+n_parts = size(partsTmp,2);
+
+if n_parts ==0
+    break
+end
+
+v2Tmp = zeros(size(vTmp));
+
+%check cell or nucleus collision
+repmat((rs+part_size)<cell_size,[1,3]);
+
+
+
+%check part collisions
+for partctr = 1:n_parts
+    c = partsTmp(:,partctr);
+    e = [1:partctr-1 partctr+1:n_parts];%exlude self
+    %distances to all other particles
+    cdists = ((partsTmp(e,1)-c(1)).^2+(partsTmp(e,2)-c(2)).^2+(partsTmp(e,3)-c(3)).^2).^.5;
+    distCondition = cdists<2.*part_size;
+    collParts = partsTmp(distCondition,:);
+    
+    collVs = collParts - repmat(partsTmp(partctr,:),[1,size(collParts,2)]);
+    
+    collVs = 
+    
+    [collTH,collPHI,~] = cart2sph(x,y,z)
+    
+    v2Tmp(partctr,:) = sum(collVs)
+end
+
+
+theTime = theTime+time_unit;
+end
+
+
+function spheres_intersect
+
+posFromCenter = 
